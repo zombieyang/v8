@@ -1630,6 +1630,8 @@ Type Typer::Visitor::JSCallTyper(Type fun, Typer* t) {
     case Builtins::kStringPrototypeEndsWith:
     case Builtins::kStringPrototypeIncludes:
       return Type::Boolean();
+    case Builtins::kStringZombie:
+      return Type::Number();
     case Builtins::kStringRaw:
     case Builtins::kStringRepeat:
     case Builtins::kStringPrototypeSlice:

@@ -486,5 +486,11 @@ BUILTIN(StringRaw) {
   RETURN_RESULT_OR_FAILURE(isolate, result_builder.Finish());
 }
 
+BUILTIN(StringZombie)
+{
+  HandleScope scope(isolate);
+  return *isolate->factory()->NewNumber(2.0);
+}
+
 }  // namespace internal
 }  // namespace v8

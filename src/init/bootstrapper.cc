@@ -2000,6 +2000,9 @@ void Genesis::InitializeGlobal(Handle<JSGlobalObject> global_object,
     // Install the String.raw function.
     SimpleInstallFunction(isolate_, string_fun, "raw", Builtins::kStringRaw, 1,
                           false);
+    // Install the String.raw function.
+    SimpleInstallFunction(isolate_, string_fun, "zombie", Builtins::kStringZombie, 1,
+                          false);
 
     // Create the %StringPrototype%
     Handle<JSPrimitiveWrapper> prototype = Handle<JSPrimitiveWrapper>::cast(
