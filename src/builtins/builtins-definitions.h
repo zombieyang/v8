@@ -792,6 +792,8 @@ namespace internal {
   TFJ(StringPrototypeTrimStart, kDontAdaptArgumentsSentinel)                   \
   /* ES6 #sec-string.raw */                                                    \
   CPP(StringRaw)                                                               \
+  CPP(StringPuertsCallback)                                               \
+  CPP(StringPuertsMakeCallback)                                               \
                                                                                \
   /* Symbol */                                                                 \
   /* ES #sec-symbol-constructor */                                             \

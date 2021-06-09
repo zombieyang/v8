@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "src/api/api-inl.h"
 #include "src/builtins/builtins-utils-inl.h"
 #include "src/builtins/builtins.h"
+#include "src/builtins/builtins-puerts.h"
 #include "src/heap/heap-inl.h"  // For ToBoolean. TODO(jkummerow): Drop.
 #include "src/logging/counters.h"
 #include "src/numbers/conversions.h"
@@ -482,6 +484,51 @@ BUILTIN(StringRaw) {
   }
 
   RETURN_RESULT_OR_FAILURE(isolate, result_builder.Finish());
+}
+
+// BUILTIN(StringPuerts) {
+//   Handle<JSObject> result;
+//   Handle<JSFunction> target = args.target();
+//   Handle<JSReceiver> new_target = Handle<JSReceiver>::cast(args.new_target());
+//   ASSIGN_RETURN_FAILURE_ON_EXCEPTION(
+//       isolate, result,
+//       JSObject::New(target, new_target, Handle<AllocationSite>::null()));
+//   return *result;
+// }
+
+BUILTIN(StringPuertsCallback) {
+  HandleScope handle_scope(isolate);
+  Handle<JSFunction> target = args.target();
+  
+  double ptr = target->GetEmbedderField(0).Number();
+  PuertsCSharpFunction function = (PuertsCSharpFunction)(int64_t)ptr;
+
+  int32_t length = args.length();
+  Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  for (int32_t i = 1; i < length; i++) { // 0 是this
+    localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  }
+  
+  return *isolate->factory()->NewNumber(function(localArgs, length, 0));
+}
+
+BUILTIN(StringPuertsMakeCallback) {
+  Factory* const factory = isolate->factory();
+  Handle<Object> targetid = args.at<Object>(1);
+
+  Handle<String> name = factory->InternalizeUtf8String("PuertsCallback");
+  NewFunctionArgs newArgs = NewFunctionArgs::ForBuiltinWithoutPrototype(
+      name, Builtins::kStringPuertsCallback, i::LanguageMode::kSloppy);
+  Handle<JSFunction> fun = factory->NewFunction(newArgs);
+
+  fun->shared().set_native(true);
+  fun->shared().DontAdaptArguments();
+  fun->shared().set_length(1);
+
+  JSObject::AddProperty(isolate, fun, "funcid", targetid, DONT_ENUM);
+  fun->SetEmbedderField(0, *targetid);
+
+  return *fun;
 }
 
 }  // namespace internal
