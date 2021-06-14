@@ -545,7 +545,7 @@ BUILTIN(StringPuertsIDCallback) {
   // Handle<Object> target = args.at<Object>(0);
   // double callbackID = JSObject::cast(*target).GetEmbedderField(0).Number();
 
-  v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
+  // v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
   // V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
 
   // int32_t length = args.length();
@@ -557,7 +557,7 @@ BUILTIN(StringPuertsIDCallback) {
   // if (genericFunction != 0) {
   //   genericFunction(localArgs, length, (int)callbackID);
   // }
-  return *isolate->factory()->NewNumber((double)(int64_t)v8isolate);
+  return *isolate->factory()->NewNumber(2);
 }
 
 BUILTIN(StringPuertsMakeIDCallback) {
