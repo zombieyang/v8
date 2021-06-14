@@ -543,21 +543,21 @@ BUILTIN(StringPuertsCallback) {
 
 BUILTIN(StringPuertsIDCallback) {
   // Handle<Object> target = args.at<Object>(0);
-  // double callbackID = JSObject::cast(*target).GetEmbedderField(0).Number();
+  double callbackID = 3;//JSObject::cast(*target).GetEmbedderField(0).Number();
 
-  // v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
-  // V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
+  v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
+  V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
 
-  // int32_t length = args.length();
-  // Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
-  // for (int32_t i = 1; i < length; i++) { // 0 是this
-  //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
-  // }
+  int32_t length = args.length();
+  Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  for (int32_t i = 1; i < length; i++) { // 0 是this
+    localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  }
 
-  // if (genericFunction != 0) {
-  //   genericFunction(localArgs, length, (int)callbackID);
-  // }
-  return *isolate->factory()->NewNumber(2);
+  if (genericFunction != 0) {
+    genericFunction(localArgs, length, (int)callbackID);
+  }
+  return *isolate->factory()->NewNumber((double)(int64_t)genericFunction);
 }
 
 BUILTIN(StringPuertsMakeIDCallback) {
@@ -566,7 +566,7 @@ BUILTIN(StringPuertsMakeIDCallback) {
 
   Handle<String> name = factory->InternalizeUtf8String("PuertsCallback");
   NewFunctionArgs newArgs = NewFunctionArgs::ForBuiltinWithoutPrototype(
-      name, Builtins::kStringPuertsCallback, i::LanguageMode::kSloppy);
+      name, Builtins::kStringPuertsIDCallback, i::LanguageMode::kSloppy);
   Handle<JSFunction> fun = factory->NewFunction(newArgs);
 
   fun->shared().set_native(true);
