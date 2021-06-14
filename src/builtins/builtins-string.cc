@@ -524,6 +524,7 @@ BUILTIN(StringPuertsCallback) {
   Object functionExternal = target->GetEmbedderField(0);
   // Object callbackInfoExternal = JSObject::cast(*target).GetEmbedderField(1);
 
+  Object functionForeign = JSObject::cast(functionExternal).GetEmbedderField(0);
   // Foreign functionForeign = Foreign::cast(JSObject::cast(functionExternal).GetEmbedderField(0));
   // // Foreign callbackInfoForeign = Foreign::cast(JSObject::cast(callbackInfoExternal).GetEmbedderField(0));
 
@@ -537,7 +538,8 @@ BUILTIN(StringPuertsCallback) {
   // }
   // function(localArgs, length, callbackInfo);
   functionExternal.Print();
-  return *isolate->factory()->NewNumber(2.0);
+  functionForeign.Print();
+  return *isolate->factory()->NewNumber(3.0);
   // callback + callbackinfo 方案end
 }
 
