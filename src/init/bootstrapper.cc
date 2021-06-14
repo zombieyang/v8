@@ -1934,7 +1934,7 @@ void Genesis::InitializeGlobal(Handle<JSGlobalObject> global_object,
 
     // InstallToStringTag(isolate(), puerts_prototype, "Puerts");
 
-    SimpleInstallFunction(isolate_, puerts_object, "makeCallback", Builtins::kStringPuertsMakeCallback, 1, false);
+    SimpleInstallFunction(isolate_, puerts_object, "makeIDCallback", Builtins::kStringPuertsMakeIDCallback, 1, false);
 
     // Create the %StringPrototype%
     Handle<JSPrimitiveWrapper> prototype = Handle<JSPrimitiveWrapper>::cast(

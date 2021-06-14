@@ -8118,6 +8118,16 @@ class V8_EXPORT MeasureMemoryDelegate {
       Local<Promise::Resolver> promise_resolver, MeasureMemoryMode mode);
 };
 
+namespace Puerts {
+  typedef int (*V8CallbackFunction)(Local<Value>* value, int ParamLen, void* callbackInfo);
+
+  Local<Function> createBuiltinFunction(Isolate* v8isolate, V8CallbackFunction callback, void* callbackInfo);
+
+  typedef int (*V8GenericCallbackFunction)(Local<Value>* value, int ParamLen, int callbackID);
+
+  void registerGenericCallbackIDCallback(Isolate* v8isolate, V8GenericCallbackFunction gfunction);
+}
+
 /**
  * Isolate represents an isolated instance of the V8 engine.  V8 isolates have
  * completely separate states.  Objects from one isolate must not be used in

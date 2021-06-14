@@ -497,22 +497,70 @@ BUILTIN(StringRaw) {
 // }
 
 BUILTIN(StringPuertsCallback) {
+  // 测试方案
+  // // fun->SetEmbedderField(0, v8::External::New(callback));
+  // // fun->SetEmbedderField(1, callbackInfo);
+
+  // HandleScope handle_scope(isolate);
+  // Handle<JSFunction> target = args.target();
+  
+  // double ptr = target->GetEmbedderField(0).Number();
+  // PuertsCSharpFunction function = (PuertsCSharpFunction)(int64_t)ptr;
+
+  // int32_t length = args.length();
+  // Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  // for (int32_t i = 1; i < length; i++) { // 0 是this
+  //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  // }
+  
+  // return *isolate->factory()->NewNumber(function(localArgs, length, 0));
+  // 测试方案 end
+
+
+  // callback + callbackinfo 方案
   HandleScope handle_scope(isolate);
   Handle<JSFunction> target = args.target();
-  
-  double ptr = target->GetEmbedderField(0).Number();
-  PuertsCSharpFunction function = (PuertsCSharpFunction)(int64_t)ptr;
+
+  Object functionExternal = JSObject::cast(*target).GetEmbedderField(0);
+  // Object callbackInfoExternal = JSObject::cast(*target).GetEmbedderField(1);
+
+  Foreign functionForeign = Foreign::cast(JSObject::cast(functionExternal).GetEmbedderField(0));
+  // Foreign callbackInfoForeign = Foreign::cast(JSObject::cast(callbackInfoExternal).GetEmbedderField(0));
+
+  PuertsCallbackFunction function = (PuertsCallbackFunction)reinterpret_cast<void*>(functionForeign.foreign_address());
+  // void* callbackInfo = reinterpret_cast<void*>(callbackInfoForeign.foreign_address());
 
   int32_t length = args.length();
   Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
   for (int32_t i = 1; i < length; i++) { // 0 是this
     localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
   }
-  
-  return *isolate->factory()->NewNumber(function(localArgs, length, 0));
+  // function(localArgs, length, callbackInfo);
+
+  return *isolate->factory()->NewNumber((double)(int64_t)function);
+  // callback + callbackinfo 方案end
 }
 
-BUILTIN(StringPuertsMakeCallback) {
+BUILTIN(StringPuertsIDCallback) {
+  // Handle<Object> target = args.at<Object>(0);
+  // double callbackID = JSObject::cast(*target).GetEmbedderField(0).Number();
+
+  v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
+  // V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
+
+  // int32_t length = args.length();
+  // Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  // for (int32_t i = 1; i < length; i++) { // 0 是this
+  //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  // }
+
+  // if (genericFunction != 0) {
+  //   genericFunction(localArgs, length, (int)callbackID);
+  // }
+  return *isolate->factory()->NewNumber((double)(int64_t)v8isolate);
+}
+
+BUILTIN(StringPuertsMakeIDCallback) {
   Factory* const factory = isolate->factory();
   Handle<Object> targetid = args.at<Object>(1);
 

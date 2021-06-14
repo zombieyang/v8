@@ -11181,6 +11181,57 @@ void InvokeFinalizationRegistryCleanupFromTask(
 #undef CALLBACK_SETTER
 
 }  // namespace internal
+
+// callback + callbackinfo方案
+Local<Function> Puerts::createBuiltinFunction(Isolate* v8isolate, V8CallbackFunction callback, void* callbackInfo) {
+  using namespace internal;
+
+  internal::Isolate* isolate = reinterpret_cast<internal::Isolate*>(v8isolate);
+
+  Factory* const factory = isolate->factory();
+
+  Handle<internal::String> name = factory->InternalizeUtf8String("PuertsCallback");
+  NewFunctionArgs newArgs = NewFunctionArgs::ForBuiltinWithoutPrototype(
+    name, Builtins::kStringPuertsCallback, LanguageMode::kSloppy
+  );
+  Handle<JSFunction> fun = factory->NewFunction(newArgs);
+
+  fun->shared().set_native(true);
+  fun->shared().DontAdaptArguments();
+  fun->shared().set_length(1);
+
+  JSObject::cast(*fun).SetEmbedderField(0, *factory->NewExternal((void*)callback));
+  JSObject::cast(*fun).SetEmbedderField(1, *factory->NewExternal(callbackInfo));
+
+  // JSObject::AddProperty(
+  //   isolate,
+  //   fun,
+  //   isolate->factory()->InternalizeUtf8String("ptr3"),
+  //   factory->NewNumber((double)(int64_t)ExternalValue(fun->GetEmbedderField(1))),
+  //   DONT_ENUM
+  // );
+
+  return v8::Utils::ToLocal(fun);
+}
+// callback + callbackinfo方案end
+
+// genericCallback + callbackid 方案start
+void Puerts::registerGenericCallbackIDCallback(Isolate* v8isolate, V8GenericCallbackFunction gfunction) {
+  v8isolate->SetData(2, (void*)gfunction);
+}
+// void createBuiltinFunctionByCallbackID(Isolate* v8isolate, Local<Context> context, const char* name, int callbackID) {
+//   using namespace internal;
+
+//   char code[256];
+//   snprintf(code, 256, "%s = PuertsBuiltin.makeIDCallback(%d).bind(PuertsBuiltin)", name, callbackID);
+//   v8::Script::Compile(
+//     context,
+//     v8::String::NewFromUtf8(v8isolate, code, NewStringType::kNormal).ToLocalChecked()
+//   ).ToLocalChecked()->Run(context).ToLocalChecked();
+// }
+// genericCallback + callbackid 方案end
+
+
 }  // namespace v8
 
 #undef TRACE_BS

@@ -1664,8 +1664,9 @@ Type Typer::Visitor::JSCallTyper(Type fun, Typer* t) {
     case Builtins::kStringPrototypeIncludes:
       return Type::Boolean();
     case Builtins::kStringPuertsCallback:
+    case Builtins::kStringPuertsIDCallback:
       return Type::Number();
-    case Builtins::kStringPuertsMakeCallback:
+    case Builtins::kStringPuertsMakeIDCallback:
       return Type::BoundFunction();
     case Builtins::kStringRaw:
     case Builtins::kStringRepeat:
