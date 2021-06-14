@@ -536,8 +536,8 @@ BUILTIN(StringPuertsCallback) {
   //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
   // }
   // function(localArgs, length, callbackInfo);
-
-  return *isolate->factory()->NewNumber(2);
+  functionExternal.Print();
+  return *isolate->factory()->NewNumber((double)(int64_t)2);
   // callback + callbackinfo 方案end
 }
 
