@@ -537,7 +537,7 @@ BUILTIN(StringPuertsCallback) {
   // }
   // function(localArgs, length, callbackInfo);
   functionExternal.Print();
-  return *isolate->factory()->NewNumber((double)(int64_t)2);
+  return *isolate->factory()->NewNumber(2.0);
   // callback + callbackinfo 方案end
 }
 
