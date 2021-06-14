@@ -521,29 +521,29 @@ BUILTIN(StringPuertsCallback) {
   HandleScope handle_scope(isolate);
   Handle<JSFunction> target = args.target();
 
-  Object functionExternal = JSObject::cast(*target).GetEmbedderField(0);
+  Object functionExternal = target->GetEmbedderField(0);
   // Object callbackInfoExternal = JSObject::cast(*target).GetEmbedderField(1);
 
-  Foreign functionForeign = Foreign::cast(JSObject::cast(functionExternal).GetEmbedderField(0));
-  // Foreign callbackInfoForeign = Foreign::cast(JSObject::cast(callbackInfoExternal).GetEmbedderField(0));
+  // Foreign functionForeign = Foreign::cast(JSObject::cast(functionExternal).GetEmbedderField(0));
+  // // Foreign callbackInfoForeign = Foreign::cast(JSObject::cast(callbackInfoExternal).GetEmbedderField(0));
 
-  PuertsCallbackFunction function = (PuertsCallbackFunction)reinterpret_cast<void*>(functionForeign.foreign_address());
-  // void* callbackInfo = reinterpret_cast<void*>(callbackInfoForeign.foreign_address());
+  // PuertsCallbackFunction function = (PuertsCallbackFunction)reinterpret_cast<void*>(functionForeign.foreign_address());
+  // // void* callbackInfo = reinterpret_cast<void*>(callbackInfoForeign.foreign_address());
 
-  int32_t length = args.length();
-  Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
-  for (int32_t i = 1; i < length; i++) { // 0 是this
-    localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
-  }
+  // int32_t length = args.length();
+  // Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  // for (int32_t i = 1; i < length; i++) { // 0 是this
+  //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  // }
   // function(localArgs, length, callbackInfo);
 
-  return *isolate->factory()->NewNumber((double)(int64_t)function);
+  return *isolate->factory()->NewNumber(2);
   // callback + callbackinfo 方案end
 }
 
 BUILTIN(StringPuertsIDCallback) {
-  // Handle<Object> target = args.at<Object>(0);
-  double callbackID = 3;//JSObject::cast(*target).GetEmbedderField(0).Number();
+  Handle<JSObject> target = args.at<JSObject>(0);
+  double callbackID = target->GetEmbedderField(0).Number();
 
   v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
   V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
