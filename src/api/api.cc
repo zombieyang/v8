@@ -11217,7 +11217,31 @@ Local<Function> Puerts::createBuiltinFunction(Isolate* v8isolate, V8CallbackFunc
 
 // genericCallback + callbackid 方案start
 void Puerts::registerGenericCallbackIDCallback(Isolate* v8isolate, V8GenericCallbackFunction gfunction) {
-  v8isolate->SetData(2, (void*)gfunction);
+  using namespace internal;
+  
+  internal::Isolate* isolate = reinterpret_cast<internal::Isolate*>(v8isolate);
+  isolate->SetData(2, (void*)gfunction);
+
+
+  // Local<v8::Context> context = v8isolate->GetCurrentContext();
+
+  // Local<v8::Object> global = context->Global();
+  // Local<Value> key = v8::String::NewFromUtf8(v8isolate, "PuertsBuiltin").ToLocalChecked();
+  // Local<v8::Value> puertsBuiltin = global->Get(context, key).ToLocalChecked();
+
+  // if (puertsBuiltin->IsObject()) {
+  //   v8::Object::Cast(*puertsBuiltin)->SetInternalField(0, v8::External::New(v8isolate, (void*)gfunction));
+  // }
+
+  // internal::Isolate* isolate = reinterpret_cast<internal::Isolate*>(v8isolate);
+  // Handle<JSGlobalObject> global = isolate->global_object();
+  // Handle<internal::Object> puertsBuiltin = internal::Object::GetProperty(isolate, global, isolate->factory()->NewStringFromAsciiChecked("PuertsBuiltin")).ToHandleChecked();
+
+  // if (puertsBuiltin->IsJSObject()) {
+  //   JSObject pb = JSObject::cast(*puertsBuiltin);
+    
+  //   pb.SetEmbedderField(0, *isolate->factory()->NewExternal((void*)gfunction));
+  // }
 }
 // void createBuiltinFunctionByCallbackID(Isolate* v8isolate, Local<Context> context, const char* name, int callbackID) {
 //   using namespace internal;

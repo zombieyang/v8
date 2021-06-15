@@ -523,8 +523,24 @@ BUILTIN(StringPuertsCallback) {
 
   Object functionExternal = target->GetEmbedderField(0);
   // Object callbackInfoExternal = JSObject::cast(*target).GetEmbedderField(1);
+  char log[256];
 
   Object functionForeign = JSObject::cast(functionExternal).GetEmbedderField(0);
+  // handle_scope.handle(isolate, functionExternal.ptr());
+  snprintf(log, 256, 
+  "functionalExternal isFunction:%d isNumber:%d IsUndefined:%d IsObject:%d IsString:%d \n functionForeign isFunction:%d isNumber:%d IsUndefined:%d IsObject:%d IsString:%d\n", 
+    functionExternal.IsFunction(), 
+    functionExternal.IsNumber(), 
+    functionExternal.IsNullOrUndefined(), 
+    functionExternal.IsObject(), 
+    functionExternal.IsString(),
+    functionForeign.IsFunction(), 
+    functionForeign.IsNumber(), 
+    functionForeign.IsNullOrUndefined(), 
+    functionForeign.IsObject(), 
+    functionForeign.IsString()
+  );
+
   // Foreign functionForeign = Foreign::cast(JSObject::cast(functionExternal).GetEmbedderField(0));
   // // Foreign callbackInfoForeign = Foreign::cast(JSObject::cast(callbackInfoExternal).GetEmbedderField(0));
 
@@ -537,49 +553,64 @@ BUILTIN(StringPuertsCallback) {
   //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
   // }
   // function(localArgs, length, callbackInfo);
-  functionExternal.Print();
-  functionForeign.Print();
-  return *isolate->factory()->NewNumber(3.0);
+  // functionForeign.Print();
+  return *isolate->factory()->NewStringFromAsciiChecked(log);
   // callback + callbackinfo 方案end
 }
 
 BUILTIN(StringPuertsIDCallback) {
-  Handle<JSObject> target = args.at<JSObject>(0);
-  double callbackID = target->GetEmbedderField(0).Number();
+  Handle<JSObject> puertsThis = args.at<JSObject>(0);
 
-  v8::Isolate* v8isolate = reinterpret_cast<v8::Isolate*>(isolate);
-  V8GenericCallbackFunction genericFunction = (V8GenericCallbackFunction)v8isolate->GetData(2);
-
+  PuertsCallbackHandler* handler = (PuertsCallbackHandler*)(void*)Foreign::cast(
+    JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
+  ).foreign_address();
+  
   int32_t length = args.length();
   Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
   for (int32_t i = 1; i < length; i++) { // 0 是this
     localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
   }
 
-  if (genericFunction != 0) {
-    genericFunction(localArgs, length, (int)callbackID);
+  handler->callback(localArgs, length, handler->callbackInfo);
+  return *isolate->factory()->undefined_value();
+}
+
+BUILTIN(StringPuertsCallbackHandlerConstructor) {
+  Handle<JSFunction> target = args.target();
+  if (args.new_target()->IsUndefined(isolate)) {  // [[Call]]
+    THROW_NEW_ERROR_RETURN_FAILURE(
+        isolate, NewTypeError(MessageTemplate::kConstructorNotFunction,
+                              handle(target->shared().Name(), isolate)));
   }
-  return *isolate->factory()->NewNumber((double)(int64_t)genericFunction);
+  // [[Construct]]
+  Handle<JSReceiver> new_target = Handle<JSReceiver>::cast(args.new_target());
+  Handle<JSObject> result;
+  ASSIGN_RETURN_FAILURE_ON_EXCEPTION(
+    isolate, result,
+    JSObject::New(target, new_target, Handle<AllocationSite>::null())
+  );
+
+  return *result;
 }
 
-BUILTIN(StringPuertsMakeIDCallback) {
-  Factory* const factory = isolate->factory();
-  Handle<Object> targetid = args.at<Object>(1);
+// BUILTIN(StringPuertsMakeIDCallback) {
+//   Factory* const factory = isolate->factory();
+//   Handle<Object> callbackid = args.at<Object>(1);
 
-  Handle<String> name = factory->InternalizeUtf8String("PuertsCallback");
-  NewFunctionArgs newArgs = NewFunctionArgs::ForBuiltinWithoutPrototype(
-      name, Builtins::kStringPuertsIDCallback, i::LanguageMode::kSloppy);
-  Handle<JSFunction> fun = factory->NewFunction(newArgs);
+//   Handle<String> name = factory->InternalizeUtf8String("PuertsCallback");
+//   NewFunctionArgs newArgs = NewFunctionArgs::ForBuiltinWithoutPrototype(
+//       name, Builtins::kStringPuertsIDCallback, i::LanguageMode::kSloppy);
+//   Handle<JSFunction> fun = factory->NewFunction(newArgs);
 
-  fun->shared().set_native(true);
-  fun->shared().DontAdaptArguments();
-  fun->shared().set_length(1);
+//   fun->shared().set_native(true);
+//   fun->shared().DontAdaptArguments();
+//   fun->shared().set_length(1);
 
-  JSObject::AddProperty(isolate, fun, "funcid", targetid, DONT_ENUM);
-  fun->SetEmbedderField(0, *targetid);
+//   JSObject::AddProperty(isolate, fun, "funcid", callbackid, DONT_ENUM);
+//   fun->SetEmbedderField(0, *callbackid);
 
-  return *fun;
-}
+//   return *fun;
+// }
 
 }  // namespace internal
 }  // namespace v8

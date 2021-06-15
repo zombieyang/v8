@@ -794,7 +794,7 @@ namespace internal {
   CPP(StringRaw)                                                               \
   CPP(StringPuertsCallback)                                                    \
   CPP(StringPuertsIDCallback)                                                  \
-  CPP(StringPuertsMakeIDCallback)                                              \
+  CPP(StringPuertsCallbackHandlerConstructor)                                  \
                                                                                \
   /* Symbol */                                                                 \
   /* ES #sec-symbol-constructor */                                             \
