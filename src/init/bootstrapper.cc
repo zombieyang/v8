@@ -1936,20 +1936,20 @@ void Genesis::InitializeGlobal(Handle<JSGlobalObject> global_object,
 
     SimpleInstallFunction(isolate_, puerts_object, "idCallback", Builtins::kStringPuertsIDCallback, 1, false);
 
-    Handle<JSFunction> puerts_callback_handler_fun = InstallFunction(
-      isolate(), puerts_object, "CallbackHandler", JS_WEAK_REF_TYPE,
-      JSObject::kHeaderSize, 0, factory->the_hole_value(),
-      Builtins::kStringPuertsCallbackHandlerConstructor
-    );
-    InstallWithIntrinsicDefaultProto(isolate(), puerts_callback_handler_fun,
-                                     Context::JS_WEAK_REF_FUNCTION_INDEX);
+    // Handle<JSFunction> puerts_callback_handler_fun = InstallFunction(
+    //   isolate(), puerts_object, "CallbackHandler", JS_WEAK_REF_TYPE,
+    //   JSObject::kHeaderSize, 0, factory->the_hole_value(),
+    //   Builtins::kStringPuertsCallbackHandlerConstructor
+    // );
+    // InstallWithIntrinsicDefaultProto(isolate(), puerts_callback_handler_fun,
+    //                                  Context::JS_WEAK_REF_FUNCTION_INDEX);
 
-    SharedFunctionInfo puerts_callback_handler_sfi = puerts_callback_handler_fun->shared();
-    puerts_callback_handler_sfi.DontAdaptArguments();
-    puerts_callback_handler_sfi.set_length(1);
+    // SharedFunctionInfo puerts_callback_handler_sfi = puerts_callback_handler_fun->shared();
+    // puerts_callback_handler_sfi.DontAdaptArguments();
+    // puerts_callback_handler_sfi.set_length(1);
 
-    ObjectTemplateInfo oti = ObjectTemplateInfo::cast(puerts_callback_handler_sfi.get_api_func_data().GetInstanceTemplate());
-    oti.set_embedder_field_count(1);
+    // ObjectTemplateInfo oti = ObjectTemplateInfo::cast(puerts_callback_handler_sfi.get_api_func_data().GetInstanceTemplate());
+    // oti.set_embedder_field_count(1);
 
 
     // Create the %StringPrototype%
