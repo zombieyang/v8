@@ -571,7 +571,8 @@ BUILTIN(StringPuertsIDCallback) {
     localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
   }
 
-  handler->callback(localArgs, length, handler->callbackInfo);
+  // handler->callback(localArgs, length, handler->callbackInfo);
+  handler->callback(nullptr, 0, handler->callbackInfo);
   return *isolate->factory()->undefined_value();
 }
 
