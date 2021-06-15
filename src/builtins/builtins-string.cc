@@ -561,7 +561,7 @@ BUILTIN(StringPuertsCallback) {
 BUILTIN(StringPuertsIDCallback) {
   Handle<JSObject> puertsThis = args.at<JSObject>(0);
 
-  PuertsCallbackHandler* handler = (PuertsCallbackHandler*)(void*)Foreign::cast(
+  PuertsCallbackHandler* handler = (PuertsCallbackHandler*)Foreign::cast(
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
