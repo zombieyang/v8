@@ -1938,7 +1938,7 @@ void Genesis::InitializeGlobal(Handle<JSGlobalObject> global_object,
 
     // Handle<JSFunction> puerts_callback_handler_fun = InstallFunction(
     //   isolate(), puerts_object, "CallbackHandler", JS_WEAK_REF_TYPE,
-    //   JSObject::kHeaderSize, 0, factory->the_hole_value(),
+    //   JSObject::kHeaderSize + 4, 0, factory->the_hole_value(),
     //   Builtins::kStringPuertsCallbackHandlerConstructor
     // );
     // InstallWithIntrinsicDefaultProto(isolate(), puerts_callback_handler_fun,
