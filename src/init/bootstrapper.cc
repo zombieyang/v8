@@ -1918,39 +1918,12 @@ void Genesis::InitializeGlobal(Handle<JSGlobalObject> global_object,
                           false);
 
     // === zombie ===
-    // Handle<JSFunction> puerts_fun = InstallFunction(
-    //     isolate_, global, "BuiltinPuerts", JS_OBJECT_TYPE,
-    //     JSPrimitiveWrapper::kHeaderSize, 0,
-    //     isolate_->initial_object_prototype(), Builtins::kStringPuerts);
-    // puerts_fun->shared().DontAdaptArguments();
-    // puerts_fun->shared().set_length(1);
 
     Handle<JSObject> puerts_object =
         factory->NewJSObject(isolate_->object_function(), AllocationType::kOld);
-    JSObject::AddProperty(isolate_, global, "PuertsBuiltin", puerts_object, DONT_ENUM);
+    JSObject::AddProperty(isolate_, global, "PuertsV8", puerts_object, DONT_ENUM);
 
-    // Handle<JSObject> puerts_prototype(
-    //     JSObject::cast(puerts_fun->instance_prototype()), isolate());
-
-    // InstallToStringTag(isolate(), puerts_prototype, "Puerts");
-
-    SimpleInstallFunction(isolate_, puerts_object, "idCallback", Builtins::kStringPuertsIDCallback, 1, false);
-
-    // Handle<JSFunction> puerts_callback_handler_fun = InstallFunction(
-    //   isolate(), puerts_object, "CallbackHandler", JS_WEAK_REF_TYPE,
-    //   JSObject::kHeaderSize + 4, 0, factory->the_hole_value(),
-    //   Builtins::kStringPuertsCallbackHandlerConstructor
-    // );
-    // InstallWithIntrinsicDefaultProto(isolate(), puerts_callback_handler_fun,
-    //                                  Context::JS_WEAK_REF_FUNCTION_INDEX);
-
-    // SharedFunctionInfo puerts_callback_handler_sfi = puerts_callback_handler_fun->shared();
-    // puerts_callback_handler_sfi.DontAdaptArguments();
-    // puerts_callback_handler_sfi.set_length(1);
-
-    // ObjectTemplateInfo oti = ObjectTemplateInfo::cast(puerts_callback_handler_sfi.get_api_func_data().GetInstanceTemplate());
-    // oti.set_embedder_field_count(1);
-
+    SimpleInstallFunction(isolate_, puerts_object, "callback", Builtins::kStringPuertsCallback, 1, false);
 
     // Create the %StringPrototype%
     Handle<JSPrimitiveWrapper> prototype = Handle<JSPrimitiveWrapper>::cast(
