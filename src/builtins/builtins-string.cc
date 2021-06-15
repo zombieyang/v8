@@ -493,14 +493,22 @@ BUILTIN(StringPuertsCallback) {
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
-  int32_t length = args.length();
-  Local<Value> *localArgs = (Local<Value>*)alloca((length - 1) * sizeof(Local<Value>));
-  for (int32_t i = 1; i < length; i++) { // 0 是this
-    localArgs[i - 1] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
-  }
+  // int32_t length = args.length();
+  // Local<Value> *localArgs = (Local<Value>*)alloca((length - 1) * sizeof(Local<Value>));
+  // for (int32_t i = 1; i < length; i++) { // 0 是this
+  //   localArgs[i - 1] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  // }
 
-  handler->callback(localArgs, length, handler->callbackInfo);
-  return *isolate->factory()->undefined_value();
+  v8::FunctionCallbackInfo<v8::Value> info(
+    nullptr,
+    // Drop the first argument (receiver, i.e. the "console" object).
+    args.length() > 1 ? args.address_of_first_argument() : nullptr,
+    args.length() - 1
+  );
+
+  handler->callback(info, handler->callbackInfo);
+  // return *isolate->factory()->undefined_value();
+  return *v8::Utils::OpenHandle<v8::Value, internal::Object>(info.GetReturnValue().Get());
 }
 
 }  // namespace internal
