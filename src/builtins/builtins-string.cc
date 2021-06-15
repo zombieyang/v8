@@ -565,11 +565,11 @@ BUILTIN(StringPuertsIDCallback) {
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
-  int32_t length = args.length();
-  Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
-  for (int32_t i = 1; i < length; i++) { // 0 是this
-    localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
-  }
+  // int32_t length = args.length();
+  // Local<Value> *localArgs = (Local<Value>*)alloca(length * sizeof(Local<Value>));
+  // for (int32_t i = 1; i < length; i++) { // 0 是this
+  //   localArgs[i] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
+  // }
 
   // handler->callback(localArgs, length, handler->callbackInfo);
   handler->callback(nullptr, 0, handler->callbackInfo);
