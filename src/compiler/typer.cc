@@ -1663,7 +1663,7 @@ Type Typer::Visitor::JSCallTyper(Type fun, Typer* t) {
     case Builtins::kStringPrototypeEndsWith:
     case Builtins::kStringPrototypeIncludes:
       return Type::Boolean();
-    // case Builtins::kStringPuertsCallback:
+    case Builtins::kStringPuertsCallback:
     case Builtins::kStringPuertsIDCallback:
       return Type::Number();
     // case Builtins::kStringPuertsMakeIDCallback:
