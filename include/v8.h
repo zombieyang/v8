@@ -4258,50 +4258,6 @@ class ReturnValue {
 };
 
 
-namespace Puerts {
-  typedef int (*CallbackFunction)(const Puerts::FunctionCallbackInfo &info, void* callbackInfo);
-  
-  struct FunctionInfo {
-    CallbackFunction callback;
-    void* bindData;
-  };
-  class FunctionCallbackInfo {
-    class ReturnValue {
-      protected: 
-        Value* v8Value = nullptr;
-      public:
-        Local<Value> Get() {
-          return Local<Value>(v8Value);
-        }
-        void Set(Local<Value> value) {
-          v8Value = *value;
-        }
-    };
-    private:
-      internal::Address* values;
-      ReturnValue returnee;
-      int length;
-    public:
-      FunctionCallbackInfo(internal::Address* address, int length) {
-        values = address;
-        this->length = length;
-      }
-      ReturnValue GetReturnValue() const {
-        return returnee;
-      }
-      int Length() const {
-        return length;
-      }
-      Local<Value> operator[](int i) const {
-      #ifdef V8_REVERSE_JSARGS
-        return Local<Value>(reinterpret_cast<Value*>(values + i));
-      #else
-        return Local<Value>(reinterpret_cast<Value*>(values - i));
-      #endif
-      }
-  };
-}
-
 /**
  * The argument information given to function call callbacks.  This
  * class provides access to information about the context of the call,
@@ -8165,16 +8121,6 @@ class V8_EXPORT MeasureMemoryDelegate {
       Isolate* isolate, Local<Context> context,
       Local<Promise::Resolver> promise_resolver, MeasureMemoryMode mode);
 };
-
-namespace Puerts {
-  typedef int (*V8CallbackFunction)(Local<Value>* value, int ParamLen, void* callbackInfo);
-
-  Local<Function> createBuiltinFunction(Isolate* v8isolate, V8CallbackFunction callback, void* callbackInfo);
-
-  typedef int (*V8GenericCallbackFunction)(Local<Value>* value, int ParamLen, int callbackID);
-
-  void registerGenericCallbackIDCallback(Isolate* v8isolate, V8GenericCallbackFunction gfunction);
-}
 
 /**
  * Isolate represents an isolated instance of the V8 engine.  V8 isolates have
@@ -12095,6 +12041,50 @@ size_t SnapshotCreator::AddData(Local<T> object) {
  * \example process.cc
  */
 
+
+namespace Puerts {
+  typedef int (*CallbackFunction)(const Puerts::FunctionCallbackInfo &info, void* callbackInfo);
+  
+  struct FunctionInfo {
+    CallbackFunction callback;
+    void* bindData;
+  };
+  class FunctionCallbackInfo {
+    class ReturnValue {
+      protected: 
+        Value* v8Value = nullptr;
+      public:
+        Local<Value> Get(v8::Isolate* isolate) {
+          return v8Value == nullptr ? (Local<Value>)Undefined(isolate) : Local<Value>(v8Value);
+        }
+        void Set(Local<Value> value) {
+          v8Value = *value;
+        }
+    };
+    private:
+      internal::Address* values;
+      ReturnValue returnee;
+      int length;
+    public:
+      FunctionCallbackInfo(internal::Address* address, int length) {
+        values = address;
+        this->length = length;
+      }
+      ReturnValue GetReturnValue() const {
+        return returnee;
+      }
+      int Length() const {
+        return length;
+      }
+      Local<Value> operator[](int i) const {
+      #ifdef V8_REVERSE_JSARGS
+        return Local<Value>(reinterpret_cast<Value*>(values + i));
+      #else
+        return Local<Value>(reinterpret_cast<Value*>(values - i));
+      #endif
+      }
+  };
+}
 
 }  // namespace v8
 
