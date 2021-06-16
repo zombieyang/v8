@@ -38,6 +38,9 @@
  */
 namespace v8 {
 
+namespace Puerts {
+  class FunctionCallbackInfo;
+}
 class AccessorSignature;
 class Array;
 class ArrayBuffer;
@@ -307,6 +310,7 @@ class Local {
   template <class F>
   friend class MaybeLocal;
   template<class F> friend class FunctionCallbackInfo;
+  friend class Puerts::FunctionCallbackInfo;
   template<class F> friend class PropertyCallbackInfo;
   friend class String;
   friend class Object;
@@ -4253,6 +4257,50 @@ class ReturnValue {
   internal::Address* value_;
 };
 
+
+namespace Puerts {
+  typedef int (*CallbackFunction)(const Puerts::FunctionCallbackInfo &info, void* callbackInfo);
+  
+  struct FunctionInfo {
+    CallbackFunction callback;
+    void* bindData;
+  };
+  class FunctionCallbackInfo {
+    class ReturnValue {
+      protected: 
+        Value* v8Value = nullptr;
+      public:
+        Local<Value> Get() {
+          return Local<Value>(v8Value);
+        }
+        void Set(Local<Value> value) {
+          v8Value = *value;
+        }
+    };
+    private:
+      internal::Address* values;
+      ReturnValue returnee;
+      int length;
+    public:
+      FunctionCallbackInfo(internal::Address* address, int length) {
+        values = address;
+        this->length = length;
+      }
+      ReturnValue GetReturnValue() {
+        return returnee;
+      }
+      int Length() {
+        return length;
+      }
+      Local<Value> operator[](int i) const {
+      #ifdef V8_REVERSE_JSARGS
+        return Local<Value>(reinterpret_cast<Value*>(values + i));
+      #else
+        return Local<Value>(reinterpret_cast<Value*>(values - i));
+      #endif
+      }
+  };
+}
 
 /**
  * The argument information given to function call callbacks.  This
