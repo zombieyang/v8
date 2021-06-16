@@ -495,7 +495,8 @@ BUILTIN(StringPuertsCallback) {
   Puerts::FunctionCallbackInfo callbackInfo(args.address_of_first_argument(), args.length() - 1);
   functionInfo->callback(callbackInfo, functionInfo->bindData);
   
-  return *v8::Utils::OpenHandle<v8::Value, internal::Object>(callbackInfo.GetReturnValue().Get());
+  Local<Value> ret = callbackInfo.GetReturnValue().Get();
+  return ret == nullptr ? isolate->factory()->undefined_value() : *v8::Utils::OpenHandle<v8::Value, internal::Object>(ret);
 }
 
 }  // namespace internal
