@@ -5,7 +5,6 @@
 #include "src/api/api-inl.h"
 #include "src/builtins/builtins-utils-inl.h"
 #include "src/builtins/builtins.h"
-#include "src/builtins/builtins-puerts.h"
 #include "src/heap/heap-inl.h"  // For ToBoolean. TODO(jkummerow): Drop.
 #include "src/logging/counters.h"
 #include "src/numbers/conversions.h"
@@ -489,26 +488,14 @@ BUILTIN(StringRaw) {
 BUILTIN(StringPuertsCallback) {
   Handle<JSObject> puertsThis = args.at<JSObject>(0);
 
-  PuertsCallbackHandler* handler = (PuertsCallbackHandler*)Foreign::cast(
+  Puerts::FunctionInfo* functionInfo = (FunctionInfo*)Foreign::cast(
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
-  // int32_t length = args.length();
-  // Local<Value> *localArgs = (Local<Value>*)alloca((length - 1) * sizeof(Local<Value>));
-  // for (int32_t i = 1; i < length; i++) { // 0 是this
-  //   localArgs[i - 1] = v8::Utils::ToLocal(args.atOrUndefined(isolate, i));
-  // }
-
-  v8::FunctionCallbackInfo<v8::Value> info(
-    nullptr,
-    // Drop the first argument (receiver, i.e. the "console" object).
-    args.length() > 1 ? args.address_of_first_argument() : nullptr,
-    args.length() - 1
-  );
-
-  handler->callback(info, handler->callbackInfo);
-  // return *isolate->factory()->undefined_value();
-  return *v8::Utils::OpenHandle<v8::Value, internal::Object>(info.GetReturnValue().Get());
+  Puerts::FunctionCallbackInfo callbackInfo(args.address_of_first_argument(), args.length() - 1);
+  functionInfo->callback(callbackInfo, functionInfo->bindData);
+  
+  return *v8::Utils::OpenHandle<v8::Value, internal::Object>(callbackInfo.GetReturnValue().Get());
 }
 
 }  // namespace internal

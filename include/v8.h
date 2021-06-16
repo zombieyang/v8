@@ -112,6 +112,9 @@ template<class V, class T> class PersistentValueVector;
 template<class T, class P> class WeakCallbackObject;
 class FunctionTemplate;
 class ObjectTemplate;
+namespace Puerts {
+  class FunctionCallbackInfo;
+}
 template<typename T> class FunctionCallbackInfo;
 template<typename T> class PropertyCallbackInfo;
 class StackTrace;
@@ -152,6 +155,7 @@ class StreamingDecoder;
 namespace debug {
 class ConsoleCallArguments;
 }  // namespace debug
+
 
 // --- Handles ---
 
@@ -309,12 +313,11 @@ class Local {
   template<class F> friend class FunctionCallbackInfo;
   template<class F> friend class PropertyCallbackInfo;
   friend class String;
+  friend class Puerts::FunctionCallbackInfo;
   friend class Object;
   friend class Context;
   friend class Isolate;
-  friend class Private;
-  template<class F> friend class internal::CustomArguments;
-  friend Local<Primitive> Undefined(Isolate* isolate);
+  friend class F> friend class internal::CustomArguments;
   friend Local<Primitive> Null(Isolate* isolate);
   friend Local<Boolean> True(Isolate* isolate);
   friend Local<Boolean> False(Isolate* isolate);
@@ -1300,10 +1303,7 @@ class V8_EXPORT Data {
  * HostImportModuleDynamicallyCallback for module loading.
  */
 class V8_EXPORT ScriptOrModule {
- public:
-  /**
-   * The name that was passed by the embedder as ResourceName to the
-   * ScriptOrigin. This can be either a v8::String or v8::Undefined.
+ The name that was passed by the embedder as ResourceName to the
    */
   Local<Value> GetResourceName();
 
@@ -4254,6 +4254,49 @@ class ReturnValue {
 };
 
 
+namespace Puerts {
+  typedef int (*CallbackFunction)(const Puerts::FunctionCallbackInfo &info, void* callbackInfo);
+  
+  struct FunctionInfo {
+    CallbackFunction callback;
+    void* bindData;
+  };
+  class FunctionCallbackInfo {
+    class ReturnValue {
+      protected: 
+        Value* v8Value = nullptr;
+      public:
+        Local<Value> Get() {
+          return Local<Value>(v8Value);
+        }
+        void Set(Local<Value> value) {
+          v8Value = *value;
+        }
+    };
+    private:
+      internal::Address* values;
+      ReturnValue returnee;
+      int length;
+    public:
+      FunctionCallbackInfo(internal::Address* address, int length) {
+        values = address;
+        this->length = length;
+      }
+      ReturnValue GetReturnValue() {
+        return returnee;
+      }
+      int Length() {
+        return length;
+      }
+      Local<Value> operator[](int i) const {
+      #ifdef V8_REVERSE_JSARGS
+        return Local<Value>(reinterpret_cast<Value*>(values + i));
+      #else
+        return Local<Value>(reinterpret_cast<Value*>(values - i));
+      #endif
+      }
+  };
+}
 /**
  * The argument information given to function call callbacks.  This
  * class provides access to information about the context of the call,
@@ -4508,8 +4551,7 @@ class V8_EXPORT Function : public Object {
   int ScriptId() const;
 
   /**
-   * Returns the original function if this function is bound, else returns
-   * v8::Undefined.
+   function if this function is bound, else returns
    */
   Local<Value> GetBoundFunction() const;
 
@@ -4635,12 +4677,9 @@ class V8_EXPORT Promise : public Object {
  * if (d.has_writable()) {
  *   d.writable(); // false
  * }
- *
- * // var desc = {value: undefined}
- * v8::PropertyDescriptor d(v8::Undefined(isolate));
+ desc 
  *
  * // var desc = {get: undefined}
- * v8::PropertyDescriptor d(v8::Undefined(isolate), Local<Value>()));
  * \endcode
  */
 class V8_EXPORT PropertyDescriptor {
@@ -6979,10 +7018,7 @@ class V8_EXPORT Extension {  // NOLINT
 
 void V8_EXPORT RegisterExtension(std::unique_ptr<Extension>);
 
-// --- Statics ---
-
-V8_INLINE Local<Primitive> Undefined(Isolate* isolate);
-V8_INLINE Local<Primitive> Null(Isolate* isolate);
+// V8_INLINE Local<Primitive> Null(Isolate* isolate);
 V8_INLINE Local<Boolean> True(Isolate* isolate);
 V8_INLINE Local<Boolean> False(Isolate* isolate);
 
@@ -11121,10 +11157,8 @@ Isolate* ReturnValue<T>::GetIsolate() const {
 }
 
 template <typename T>
-Local<Value> ReturnValue<T>::Get() const {
-  typedef internal::Internals I;
+Local<Value> ReturnValue<T>::Get() const nternals I;
   if (*value_ == *I::GetRoot(GetIsolate(), I::kTheHoleValueRootIndex))
-    return Local<Value>(*Undefined(GetIsolate()));
   return Local<Value>::New(GetIsolate(), reinterpret_cast<Value*>(value_));
 }
 
@@ -11147,9 +11181,8 @@ FunctionCallbackInfo<T>::FunctionCallbackInfo(internal::Address* implicit_args,
     : implicit_args_(implicit_args), values_(values), length_(length) {}
 
 template<typename T>
-Local<Value> FunctionCallbackInfo<T>::operator[](int i) const {
+Local<::operator[](int i) const {
   // values_ points to the first argument (not the receiver).
-  if (i < 0 || length_ <= i) return Local<Value>(*Undefined(GetIsolate()));
 #ifdef V8_REVERSE_JSARGS
   return Local<Value>(reinterpret_cast<Value*>(values_ + i));
 #else
@@ -11869,10 +11902,9 @@ bool PropertyCallbackInfo<T>::ShouldThrowOnError() const {
     return args_[kShouldThrowOnErrorIndex] != I::IntToSmi(I::kDontThrow);
   }
   return v8::internal::ShouldThrowOnError(
-      reinterpret_cast<v8::internal::Isolate*>(GetIsolate()));
+      reinterpret_cast<v8::etIsolate()));
 }
 
-Local<Primitive> Undefined(Isolate* isolate) {
   typedef internal::Address S;
   typedef internal::Internals I;
   I::CheckInitialized(isolate);
