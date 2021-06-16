@@ -12054,11 +12054,14 @@ namespace Puerts {
       protected: 
         Value* v8Value = nullptr;
       public:
-        Local<Value> Get(v8::Isolate* isolate) {
-          return v8Value == nullptr ? (Local<Value>)Undefined(isolate) : Local<Value>(v8Value);
+        Local<Value> Get() {
+          return Local<Value>(v8Value);
         }
         void Set(Local<Value> value) {
           v8Value = *value;
+        }
+        bool Setted() {
+          return v8Value == nullptr;
         }
     };
     private:
