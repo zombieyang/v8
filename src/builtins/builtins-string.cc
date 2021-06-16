@@ -499,7 +499,7 @@ BUILTIN(StringPuertsCallback) {
     return *v8::Utils::OpenHandle<v8::Value, internal::Object>(callbackInfo.GetReturnValue().Get())
 
   } else {
-    return isolate->factory()->undefined_value();
+    return *isolate->factory()->undefined_value();
   }
 }
 
