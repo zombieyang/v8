@@ -496,7 +496,7 @@ BUILTIN(StringPuertsCallback) {
   functionInfo->callback(callbackInfo, functionInfo->bindData);
   
   if (callbackInfo.GetReturnValue().Setted()) {
-    return *v8::Utils::OpenHandle<v8::Value, internal::Object>(callbackInfo.GetReturnValue().Get())
+    return *v8::Utils::OpenHandle<v8::Value, internal::Object>(callbackInfo.GetReturnValue().Get());
 
   } else {
     return *isolate->factory()->undefined_value();
