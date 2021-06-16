@@ -12052,14 +12052,13 @@ namespace Puerts {
   class FunctionCallbackInfo {
     class ReturnValue {
       protected: 
-        Value* v8Value = nullptr;
+        internal::Address* v8Value = nullptr;
       public:
-        Local<Value> Get() {
-          return Local<Value>(v8Value);
+        internal::Address* Get()
+        {
+          return v8Value;
         }
-        void Set(Local<Value> value) {
-          v8Value = *value;
-        }
+        void Set(Local<Value> value);
         bool Setted() {
           return v8Value == nullptr;
         }
