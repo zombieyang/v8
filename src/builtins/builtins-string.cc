@@ -488,7 +488,7 @@ BUILTIN(StringRaw) {
 BUILTIN(StringPuertsCallback) {
   Handle<JSObject> puertsThis = args.at<JSObject>(0);
 
-  Puerts::FunctionInfo* functionInfo = (FunctionInfo*)Foreign::cast(
+  Puerts::FunctionInfo* functionInfo = (Puerts::FunctionInfo*)Foreign::cast(
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
