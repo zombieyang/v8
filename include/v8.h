@@ -4286,10 +4286,10 @@ namespace Puerts {
         values = address;
         this->length = length;
       }
-      ReturnValue GetReturnValue() {
+      ReturnValue GetReturnValue() const {
         return returnee;
       }
-      int Length() {
+      int Length() const {
         return length;
       }
       Local<Value> operator[](int i) const {
