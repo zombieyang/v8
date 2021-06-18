@@ -12043,7 +12043,7 @@ size_t SnapshotCreator::AddData(Local<T> object) {
 
 
 namespace Puerts {
-  typedef int (*CallbackFunction)(v8::Isolate* Isolate, const v8::Puerts::FunctionCallbackInfo& Info, void* Self, int ParamLen, int64_t UserData);
+  typedef void (*CallbackFunction)(v8::Isolate* Isolate, const v8::Puerts::FunctionCallbackInfo& Info, void* Self, int ParamLen, int64_t UserData);
   
   struct FunctionInfo {
     CallbackFunction callback;
