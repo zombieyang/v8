@@ -492,9 +492,10 @@ BUILTIN(StringPuertsCallback) {
     JSObject::cast(puertsThis->GetEmbedderField(0)).GetEmbedderField(0)
   ).foreign_address();
   
-  Puerts::FunctionCallbackInfo callbackInfo(args.address_of_first_argument(), args.length() - 1);
-  functionInfo->callback(callbackInfo, functionInfo->bindData);
-  
+  int argLength = args.length() - 1;
+  Puerts::FunctionCallbackInfo callbackInfo(args.address_of_first_argument(), argLength);
+  functionInfo->callback(reinterpret_cast<v8::Isolate*>(isolate) , callbackInfo, nullptr, argLength, (int64_t)functionInfo->bindData);
+  // (v8::Isolate* Isolate, const v8::Puerts::FunctionCallbackInfo& Info, void* Self, int ParamLen, int64_t UserData)
   if (callbackInfo.GetReturnValue().Setted()) {
     internal::Object ret(*callbackInfo.GetReturnValue().Get());
     return ret;

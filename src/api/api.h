@@ -557,10 +557,6 @@ void InvokeFinalizationRegistryCleanupFromTask(
     Handle<Object> callback);
 
 }
-void Puerts::FunctionCallbackInfo::ReturnValue::Set(v8::Local<v8::Value> value) {
-    internal::Address iValue = v8::Utils::OpenHandle(*value)->ptr();
-    v8Value = &iValue;
-}
 }  // namespace v8
 
 #endif  // V8_API_API_H_
